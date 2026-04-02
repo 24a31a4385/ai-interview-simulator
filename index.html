@@ -71,7 +71,7 @@
 
 <br>
 
-<button onclick="submitAnswer()">Submit</button>
+<button id="submitBtn" onclick="submitAnswer()">Submit</button>
 
 <h3 id="result"></h3>
 <h3 id="scoreTotal"></h3>
@@ -83,21 +83,22 @@ let timeLeft = 60;
 let timer;
 let totalScore = 0;
 let questionCount = 0;
+let askedQuestions = [];
 
 const questions = {
   frontend: {
-    easy: ["What is HTML?", "What is CSS?","What is Javascript?","What is Display Property?"],
-    medium: ["Explain React hooks", "What is Virtual DOM?","What is Closure?","What is Event Bubbling?"],
-    hard: ["Explain React lifecycle deeply","Explain Event Loop in Javascript?","What is CORS?"]
+    easy: ["What is HTML?", "What is CSS?"],
+    medium: ["Explain React hooks", "What is Virtual DOM?"],
+    hard: ["Explain React lifecycle deeply"]
   },
   backend: {
-    easy: ["What is Node.js?","What is Primary Key?","What is JSON?"],
-    medium: ["Explain REST API","Explain Indexing?","SQL vs NoSQL difference?"],
-    hard: ["Explain authentication & JWT","Explain XSS?"]
+    easy: ["What is Node.js?"],
+    medium: ["Explain REST API"],
+    hard: ["Explain authentication & JWT"]
   },
   hr: {
-    easy: ["Tell me about yourself""What are your Strenghts","Why do you want this Job"],
-    medium: ["Why should we hire you?","What are your long-term goals","Why did you choose this field"],
+    easy: ["Tell me about yourself"],
+    medium: ["Why should we hire you?"],
     hard: ["Describe a failure situation"]
   }
 };
@@ -107,9 +108,20 @@ function startInterview() {
   const level = document.getElementById("difficulty").value;
 
   const list = questions[role][level];
-  currentQuestion = list[Math.floor(Math.random() * list.length)];
+
+  // Avoid repeating same question
+  const available = list.filter(q => !askedQuestions.includes(q));
+  currentQuestion = available.length
+    ? available[Math.floor(Math.random() * available.length)]
+    : list[Math.floor(Math.random() * list.length)];
+
+  askedQuestions.push(currentQuestion);
 
   document.getElementById("question").innerText = currentQuestion;
+  document.getElementById("result").innerText = "";
+  document.getElementById("answer").value = "";
+
+  document.getElementById("submitBtn").disabled = false;
 
   startTimer();
 }
@@ -124,15 +136,21 @@ function startTimer() {
 
     if (timeLeft <= 0) {
       clearInterval(timer);
-      alert("Time's up!");
+      document.getElementById("submitBtn").disabled = true;
+      document.getElementById("result").innerText = "⏰ Time's up!";
     }
   }, 1000);
 }
 
 function submitAnswer() {
-  clearInterval(timer);
+  const answer = document.getElementById("answer").value.trim();
 
-  const answer = document.getElementById("answer").value;
+  if (!answer) {
+    alert("Please enter your answer!");
+    return;
+  }
+
+  clearInterval(timer);
 
   let score = 5;
   if (answer.length > 80) score = 10;
@@ -147,7 +165,7 @@ function submitAnswer() {
   document.getElementById("scoreTotal").innerText =
     "Total Score: " + totalScore + " / " + (questionCount * 10);
 
-  document.getElementById("answer").value = "";
+  document.getElementById("submitBtn").disabled = true;
 }
 </script>
 

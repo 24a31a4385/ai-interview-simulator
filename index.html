@@ -10,24 +10,29 @@
       background: #121212;
       color: white;
     }
+
     select, textarea, button {
       margin: 10px;
       padding: 10px;
       border-radius: 8px;
       border: none;
     }
+
     textarea {
       width: 300px;
       height: 100px;
     }
+
     button {
       background: #00adb5;
       color: white;
       cursor: pointer;
     }
+
     button:hover {
       background: #007b80;
     }
+
     .card {
       background: #1e1e1e;
       padding: 20px;
@@ -38,6 +43,7 @@
 </head>
 
 <body>
+
 <div class="card">
 <h2>🤖 Smart AI Interview Trainer</h2>
 
@@ -54,14 +60,18 @@
 </select>
 
 <br>
-<button id="startBtn">Start Interview</button>
 
-<h3 id="question">Your question will appear here</h3>
+<button onclick="startInterview()">Start Interview</button>
+
+<h3 id="timer">⏱ Time: 60</h3>
+
+<h3 id="question"></h3>
 
 <textarea id="answer" placeholder="Type your answer"></textarea>
 
 <br>
-<button id="submitBtn">Submit</button>
+
+<button onclick="submitAnswer()">Submit</button>
 
 <h3 id="result"></h3>
 <h3 id="scoreTotal"></h3>
@@ -69,10 +79,11 @@
 
 <script>
 let currentQuestion = "";
+let timeLeft = 60;
+let timer;
 let totalScore = 0;
 let questionCount = 0;
 
-// Questions
 const questions = {
   frontend: {
     easy: ["What is HTML?", "What is CSS?"],
@@ -91,37 +102,37 @@ const questions = {
   }
 };
 
-// BUTTONS
-const startBtn = document.getElementById("startBtn");
-const submitBtn = document.getElementById("submitBtn");
-
-// Start Interview
-startBtn.addEventListener("click", () => {
+function startInterview() {
   const role = document.getElementById("role").value;
   const level = document.getElementById("difficulty").value;
 
-  if (!questions[role] || !questions[role][level]) {
-    alert("No questions found for this selection!");
-    return;
-  }
-
   const list = questions[role][level];
-  const randomIndex = Math.floor(Math.random() * list.length);
-  currentQuestion = list[randomIndex];
+  currentQuestion = list[Math.floor(Math.random() * list.length)];
 
   document.getElementById("question").innerText = currentQuestion;
-  document.getElementById("result").innerText = "";
-  document.getElementById("answer").value = "";
-});
 
-// Submit Answer
-submitBtn.addEventListener("click", () => {
-  const answer = document.getElementById("answer").value.trim();
+  startTimer();
+}
 
-  if (!answer) {
-    alert("Please enter your answer!");
-    return;
-  }
+function startTimer() {
+  timeLeft = 60;
+  clearInterval(timer);
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = "⏱ Time: " + timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert("Time's up!");
+    }
+  }, 1000);
+}
+
+function submitAnswer() {
+  clearInterval(timer);
+
+  const answer = document.getElementById("answer").value;
 
   let score = 5;
   if (answer.length > 80) score = 10;
@@ -132,11 +143,13 @@ submitBtn.addEventListener("click", () => {
 
   document.getElementById("result").innerText =
     "Score: " + score + (score >= 8 ? " | Excellent 🔥" : " | Improve");
+
   document.getElementById("scoreTotal").innerText =
     "Total Score: " + totalScore + " / " + (questionCount * 10);
 
   document.getElementById("answer").value = "";
-});
+}
 </script>
+
 </body>
 </html>

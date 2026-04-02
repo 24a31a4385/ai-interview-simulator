@@ -2,49 +2,10 @@
 <html>
 <head>
   <title>Smart AI Interview Trainer</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      margin-top: 30px;
-      background: #121212;
-      color: white;
-    }
-
-    select, textarea, button {
-      margin: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-    }
-
-    textarea {
-      width: 300px;
-      height: 100px;
-    }
-
-    button {
-      background: #00adb5;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #007b80;
-    }
-
-    .card {
-      background: #1e1e1e;
-      padding: 20px;
-      border-radius: 10px;
-      display: inline-block;
-    }
-  </style>
 </head>
 
-<body>
+<body style="text-align:center; font-family:Arial; background:#121212; color:white;">
 
-<div class="card">
 <h2>🤖 Smart AI Interview Trainer</h2>
 
 <select id="role">
@@ -59,31 +20,22 @@
   <option value="hard">Hard</option>
 </select>
 
-<br>
+<br><br>
 
 <button onclick="startInterview()">Start Interview</button>
 
-<h3 id="timer">⏱ Time: 60</h3>
+<h3 id="question">Question will appear here</h3>
 
-<h3 id="question"></h3>
+<textarea id="answer" placeholder="Type answer"></textarea>
 
-<textarea id="answer" placeholder="Type your answer"></textarea>
+<br><br>
 
-<br>
-
-<button id="submitBtn" onclick="submitAnswer()">Submit</button>
+<button onclick="submitAnswer()">Submit</button>
 
 <h3 id="result"></h3>
-<h3 id="scoreTotal"></h3>
-</div>
 
 <script>
 let currentQuestion = "";
-let timeLeft = 60;
-let timer;
-let totalScore = 0;
-let questionCount = 0;
-let askedQuestions = [];
 
 const questions = {
   frontend: {
@@ -107,65 +59,33 @@ function startInterview() {
   const role = document.getElementById("role").value;
   const level = document.getElementById("difficulty").value;
 
-  const list = questions[role][level];
+  console.log(role, level); // debug
 
-  // Avoid repeating same question
-  const available = list.filter(q => !askedQuestions.includes(q));
-  currentQuestion = available.length
-    ? available[Math.floor(Math.random() * available.length)]
-    : list[Math.floor(Math.random() * list.length)];
-
-  askedQuestions.push(currentQuestion);
-
-  document.getElementById("question").innerText = currentQuestion;
-  document.getElementById("result").innerText = "";
-  document.getElementById("answer").value = "";
-
-  document.getElementById("submitBtn").disabled = false;
-
-  startTimer();
-}
-
-function startTimer() {
-  timeLeft = 60;
-  clearInterval(timer);
-
-  timer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("timer").innerText = "⏱ Time: " + timeLeft;
-
-    if (timeLeft <= 0) {
-      clearInterval(timer);
-      document.getElementById("submitBtn").disabled = true;
-      document.getElementById("result").innerText = "⏰ Time's up!";
-    }
-  }, 1000);
-}
-
-function submitAnswer() {
-  const answer = document.getElementById("answer").value.trim();
-
-  if (!answer) {
-    alert("Please enter your answer!");
+  if (!questions[role] || !questions[role][level]) {
+    alert("Question not found!");
     return;
   }
 
-  clearInterval(timer);
+  const list = questions[role][level];
 
-  let score = 5;
-  if (answer.length > 80) score = 10;
-  else if (answer.length > 40) score = 8;
+  const randomIndex = Math.floor(Math.random() * list.length);
+  currentQuestion = list[randomIndex];
 
-  totalScore += score;
-  questionCount++;
+  document.getElementById("question").innerText = currentQuestion;
+}
+
+function submitAnswer() {
+  const answer = document.getElementById("answer").value;
+
+  if (!answer) {
+    alert("Enter answer first");
+    return;
+  }
+
+  let score = answer.length > 30 ? 10 : 5;
 
   document.getElementById("result").innerText =
-    "Score: " + score + (score >= 8 ? " | Excellent 🔥" : " | Improve");
-
-  document.getElementById("scoreTotal").innerText =
-    "Total Score: " + totalScore + " / " + (questionCount * 10);
-
-  document.getElementById("submitBtn").disabled = true;
+    "Score: " + score;
 }
 </script>
 

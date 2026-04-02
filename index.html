@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Interview Simulator</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin-top: 50px; }
+    textarea { width: 300px; height: 100px; }
+    button { padding: 10px; margin: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>AI Interview Simulator</h2>
+
+<select id="role">
+  <option value="frontend">Frontend</option>
+  <option value="backend">Backend</option>
+  <option value="hr">HR</option>
+</select>
+
+<br>
+<button onclick="getQuestion()">Start Interview</button>
+
+<h3 id="question"></h3>
+
+<textarea id="answer" placeholder="Type your answer"></textarea>
+
+<br>
+<button onclick="submitAnswer()">Submit</button>
+
+<h3 id="result"></h3>
+
+<script>
+const questions = {
+  frontend: [
+    "What is React?",
+    "Explain useState hook",
+    "What is Virtual DOM?"
+  ],
+  backend: [
+    "What is Node.js?",
+    "Explain REST API",
+    "What is middleware?"
+  ],
+  hr: [
+    "Tell me about yourself",
+    "Why should we hire you?",
+    "What are your strengths?"
+  ]
+};
+
+function getQuestion() {
+  const role = document.getElementById("role").value;
+  const list = questions[role];
+  const random = list[Math.floor(Math.random() * list.length)];
+  document.getElementById("question").innerText = random;
+}
+
+function submitAnswer() {
+  const answer = document.getElementById("answer").value;
+
+  let score = 5;
+  if (answer.length > 50) score = 9;
+  else if (answer.length > 20) score = 7;
+
+  document.getElementById("result").innerText =
+    "Score: " + score +
+    (score > 7 ? " | Good 👍" : " | Improve answer");
+}
+</script>
+
+</body>
+</html>

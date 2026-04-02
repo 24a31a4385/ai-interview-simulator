@@ -1,16 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Interview Simulator</title>
+  <title>Smart AI Interview Trainer</title>
   <style>
-    body { font-family: Arial; text-align: center; margin-top: 50px; }
-    textarea { width: 300px; height: 100px; }
-    button { padding: 10px; margin: 10px; }
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 30px;
+      background: #121212;
+      color: white;
+    }
+
+    select, textarea, button {
+      margin: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    textarea {
+      width: 300px;
+      height: 100px;
+    }
+
+    button {
+      background: #00adb5;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #007b80;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      display: inline-block;
+    }
   </style>
 </head>
+
 <body>
 
-<h2>AI Interview Simulator</h2>
+<div class="card">
+<h2>🤖 Smart AI Interview Trainer</h2>
 
 <select id="role">
   <option value="frontend">Frontend</option>
@@ -18,54 +53,101 @@
   <option value="hr">HR</option>
 </select>
 
+<select id="difficulty">
+  <option value="easy">Easy</option>
+  <option value="medium">Medium</option>
+  <option value="hard">Hard</option>
+</select>
+
 <br>
-<button onclick="getQuestion()">Start Interview</button>
+
+<button onclick="startInterview()">Start Interview</button>
+
+<h3 id="timer">⏱ Time: 60</h3>
 
 <h3 id="question"></h3>
 
 <textarea id="answer" placeholder="Type your answer"></textarea>
 
 <br>
+
 <button onclick="submitAnswer()">Submit</button>
 
 <h3 id="result"></h3>
+<h3 id="scoreTotal"></h3>
+</div>
 
 <script>
+let currentQuestion = "";
+let timeLeft = 60;
+let timer;
+let totalScore = 0;
+let questionCount = 0;
+
 const questions = {
-  frontend: [
-    "What is React?",
-    "Explain useState hook",
-    "What is Virtual DOM?"
-  ],
-  backend: [
-    "What is Node.js?",
-    "Explain REST API",
-    "What is middleware?"
-  ],
-  hr: [
-    "Tell me about yourself",
-    "Why should we hire you?",
-    "What are your strengths?"
-  ]
+  frontend: {
+    easy: ["What is HTML?", "What is CSS?"],
+    medium: ["Explain React hooks", "What is Virtual DOM?"],
+    hard: ["Explain React lifecycle deeply"]
+  },
+  backend: {
+    easy: ["What is Node.js?"],
+    medium: ["Explain REST API"],
+    hard: ["Explain authentication & JWT"]
+  },
+  hr: {
+    easy: ["Tell me about yourself"],
+    medium: ["Why should we hire you?"],
+    hard: ["Describe a failure situation"]
+  }
 };
 
-function getQuestion() {
+function startInterview() {
   const role = document.getElementById("role").value;
-  const list = questions[role];
-  const random = list[Math.floor(Math.random() * list.length)];
-  document.getElementById("question").innerText = random;
+  const level = document.getElementById("difficulty").value;
+
+  const list = questions[role][level];
+  currentQuestion = list[Math.floor(Math.random() * list.length)];
+
+  document.getElementById("question").innerText = currentQuestion;
+
+  startTimer();
+}
+
+function startTimer() {
+  timeLeft = 60;
+  clearInterval(timer);
+
+  timer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = "⏱ Time: " + timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      alert("Time's up!");
+    }
+  }, 1000);
 }
 
 function submitAnswer() {
+  clearInterval(timer);
+
   const answer = document.getElementById("answer").value;
 
   let score = 5;
-  if (answer.length > 50) score = 9;
-  else if (answer.length > 20) score = 7;
+  if (answer.length > 80) score = 10;
+  else if (answer.length > 40) score = 8;
+
+  totalScore += score;
+  questionCount++;
 
   document.getElementById("result").innerText =
-    "Score: " + score +
-    (score > 7 ? " | Good 👍" : " | Improve answer");
+    "Score: " + score + (score >= 8 ? " | Excellent 🔥" : " | Improve");
+
+  document.getElementById("scoreTotal").innerText =
+    "Total Score: " + totalScore + " / " + (questionCount * 10);
+
+  document.getElementById("answer").value = "";
 }
 </script>
 
